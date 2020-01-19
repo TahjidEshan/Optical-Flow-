@@ -39,20 +39,33 @@ def image_difference(img1, img2):
     cv2.imshow("img1", img1)
     cv2.imshow("img2", img2)
     cv2.imshow("output", output)
-    return output
+    return connected_components(output)
 
 
 def connected_components(image):
     image = image.astype(np.uint8)
-    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
+    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=8)
     sizes = stats[1:, -1]
-    #remove small components
-    min_size = 200
+    # remove small components
+    min_size = 1000
     img2 = np.zeros(output.shape)
     for i in range(0, nb_components - 1):
         if sizes[i] >= min_size:
             img2[output == i + 1] = 255
-    return img2
+    kernel = np.ones((5, 5), np.uint8)
+    # closing
+    closed_image = cv2.morphologyEx(img2, cv2.MORPH_OPEN, kernel)
+    contours, _ = cv2.findContours(closed_image.astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    for c in contours:
+        rect = cv2.boundingRect(c)
+        cv2.contourArea(c)
+        x, y, w, h = rect
+        cv2.rectangle(closed_image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        # cv2.putText(closed_image, 'Moth Detected', (x + w + 10, y + h), 0, 0.3, (0, 255, 0))
+    cv2.imshow("Show", closed_image)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+    return closed_image
 
 
 def main(takepics=False):
@@ -65,9 +78,8 @@ def main(takepics=False):
 
     for i in range(1, len(images)):
         output = image_difference(images[i - 1], images[i])
-        cv2.imshow("asds", undesired_objects(output))
-        cv2.waitKey()
-        break
+        # cv2.imshow("final_image", output)
+        # cv2.waitKey()
 
 
 if __name__ == "__main__":
