@@ -51,7 +51,7 @@ def connected_components(image):
     img2 = np.zeros(output.shape)
     for i in range(0, nb_components - 1):
         if sizes[i] >= min_size:
-            img2[output == i + 1] = 255
+            img2[output == i + 1] = 1
     kernel = np.ones((5, 5), np.uint8)
     # closing
     closed_image = cv2.morphologyEx(img2, cv2.MORPH_OPEN, kernel)
@@ -60,7 +60,7 @@ def connected_components(image):
         rect = cv2.boundingRect(c)
         cv2.contourArea(c)
         x, y, w, h = rect
-        cv2.rectangle(closed_image, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        cv2.rectangle(closed_image, (x, y), (x + w, y + h), (1, 0, 0), 2)
         # cv2.putText(closed_image, 'Moth Detected', (x + w + 10, y + h), 0, 0.3, (0, 255, 0))
     cv2.imshow("Show", closed_image)
     cv2.waitKey()
@@ -70,7 +70,7 @@ def connected_components(image):
 
 def main(takepics=False):
     if takepics:
-        capture(2, 5)
+        capture(6, 1)
     images = []
     directory = r'venv\Images\%s\\' % date.today().strftime("%B_%d_%Y")
     for file in os.listdir(directory):
