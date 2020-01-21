@@ -6,16 +6,17 @@ function [difference, bounding_box] = image_difference(frame1, frame2)
     for i = 1:rows
         for j = 1:columns
             for k= 1:numberOfColorChannels
-                if frame2(i,j,k)-frame1(i,j,k)>threshold
-                    difference(i,j,k) = 1; 
+                pixeldifference = frame2(i,j,k)-frame1(i,j,k);
+                if pixeldifference>threshold
+                    difference(i,j,k) = pixeldifference; 
                 end
             end
         end
     end
     difference = rgb2gray(difference);
-    difference = bwareaopen(difference,5);
-    se = strel('disk',2);
-    difference = imclose(difference,se);
+%     difference = bwareaopen(difference,5);
+%     se = strel('disk',2);
+%     difference = imclose(difference,se);
 %     bounding_box = regionprops(difference,'Boundingbox') ;
 %     %imshow(img2)
 %     hold on
