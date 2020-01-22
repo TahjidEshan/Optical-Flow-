@@ -1,10 +1,7 @@
-function [] = script(calculate_difference)
-    % 
-    % numofframes = 20;
-    % imagecapture(numofframes,2);
-    D = '.\armD32im1\';
-   % D = '/cshome/tahjid/Optical-Flow-/CMPUT 615 Assignment 1/armD32im1/';
-%     D = '/cshome/tahjid/Optical-Flow-/CMPUT 615 Assignment 1/camera/';
+function [] = script()
+
+    D = '.\arm\';
+;
     S = dir(fullfile(D,'*.png')); % pattern to match filenames.
     F = fullfile(D,S(1).name);
     first_frame = imread(F);
@@ -14,10 +11,6 @@ function [] = script(calculate_difference)
         F = fullfile(D,S(k).name);
         current_frame = imread(F);
         disp("loaded new image")
-        %imshow(current_frame)
-        %calculating difference
-
-        %calculating optical flow
         figure;
 %         hold on
         disp("starting optical flow")

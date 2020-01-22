@@ -1,7 +1,7 @@
-function [] = calculateimagedifference()
-    task = input('Press 1 for Image difference\nPress 2 for optical flow');
+function [] = main()
+    task = input('Press 1 for Image difference\nPress 2 for optical flow\n');
     if task == 1
-        choice = input('Press 1 for taking pictures with the camera\nPress 2 for arm moving images\nPlace 3 for flower images');
+        choice = input('Press 1 for taking pictures with the camera\nPress 2 for arm moving images\nPlace 3 for flower images\n');
         if choice == 1
            imagecapture();
            directory = '.\camera\';
@@ -35,14 +35,11 @@ function [] = calculateimagedifference()
         end
         close all
     else
-        choice = input('Press 1 for taking pictures with the camera\nPress 2 for arm moving images\nPlace 3 for flower images');
+        
+        blocksize = input('Provide blocksize\n');
+        choice = input('Press 1 for taking pictures with the camera\nPress 2 for arm moving images\nPlace 3 for flower images\n');
         if choice == 1
-            [~, first_frame] = mexMTF2('get_frame');
-            while true
-                [~, current_frame] = mexMTF2('get_frame');
-                opticalflow(first_frame, current_frame, blocksize);
-                first_frame = current_frame;
-            end
+            livecam(blocksize);
         elseif choice == 2
            disp('Loading arm movement images');
            directory = '.\arm\';
@@ -50,17 +47,20 @@ function [] = calculateimagedifference()
            disp('Loading flower images');
            directory = '.\flower\';
         end
-                S = dir(fullfile(directory,'*.png')); 
+        S = dir(fullfile(directory,'*.png')); 
         F = fullfile(directory,S(1).name);
         first_frame = imread(F);
-        figure;
-        blocksize = input('Provide blocksize')
+        M(1) = getframe;
         for k = 2:numel(S)
             F = fullfile(directory,S(k).name);
             current_frame = imread(F);
+            figure;
             opticalflownew(first_frame, current_frame, blocksize);
             first_frame=current_frame;
+            M(k) = getframe;
         end
+        movie(M)
+        save myMovie M;
         close all
     end
 

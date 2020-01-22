@@ -3,7 +3,7 @@ function [] = livecam(blocksize)
     [~, first_frame] = mexMTF2('get_frame');
     while true
         [~, current_frame] = mexMTF2('get_frame');
-        opticalflow(first_frame, current_frame, blocksize);
+        opticalflownew(first_frame, current_frame, blocksize);
 %         imshow(current_frame)
         first_frame = current_frame;
     end
