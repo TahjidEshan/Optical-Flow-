@@ -1,12 +1,12 @@
-function [difference, normalized_difference, has_difference] = image_difference(frame1, frame2)
+function [difference] = image_difference(frame1, frame2)
 %     [rows, columns, numberOfColorChannels] = size(frame1); 
 %     difference = zeros(rows, columns, numberOfColorChannels);
-    normalized_difference = 0;
+    %normalized_difference = 0;
     threshold = 40;
-    has_difference = false;
+%     has_difference = false;
     difference = abs(double(rgb2gray(frame2))-double(rgb2gray(frame1)));
     
-     difference = difference > threshold;
+    difference = difference > threshold;
 %     for i = 1:rows
 %         for j = 1:columns
 %             for k= 1:numberOfColorChannels

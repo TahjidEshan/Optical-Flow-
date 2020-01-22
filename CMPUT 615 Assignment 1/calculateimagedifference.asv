@@ -1,8 +1,13 @@
-function [] = script(calculate_difference)
-    % 
+function [] = calculateimagedifference()
+    choice = input('Press 1 for taking pictures with the camera\nPress 2 for arm moving images\nPlace 3 for flower images')
+    if choice == 1
+       numberofframes = input('How many frames should the camera capture?')
+       interval = input('How many seconds should the system wait between each frame?')
+       
+       % 
     % numofframes = 20;
     % imagecapture(numofframes,2);
-    D = '.\armD32im1\';
+    D = 'C:\Users\Eshan\Documents\CMPUT 615 Assignment 1\armD32im1\';
    % D = '/cshome/tahjid/Optical-Flow-/CMPUT 615 Assignment 1/armD32im1/';
 %     D = '/cshome/tahjid/Optical-Flow-/CMPUT 615 Assignment 1/camera/';
     S = dir(fullfile(D,'*.png')); % pattern to match filenames.
@@ -16,7 +21,20 @@ function [] = script(calculate_difference)
         disp("loaded new image")
         %imshow(current_frame)
         %calculating difference
-
+        if calculate_difference
+            disp(['Calculating difference for frame',' ', num2str(k-1),' ','and frame',' ', num2str(k)])
+            [original_difference] = image_difference(first_frame, current_frame);
+            figure;
+            subplot(2,2,1);
+            imshow(first_frame);
+            subplot(2,2,2);
+            imshow(current_frame);
+            subplot(2,2,3);    
+            imshow(uint8(original_difference), 'DisplayRange', []);
+%             subplot(2,2,4);
+%             imshow(uint8(normalized_difference));
+            
+        end
         %calculating optical flow
         figure;
 %         hold on
@@ -33,4 +51,5 @@ function [] = script(calculate_difference)
 
 
     close all
+end
 end
