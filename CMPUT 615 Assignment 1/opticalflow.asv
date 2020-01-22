@@ -1,103 +1,54 @@
 function [] = opticalflow(frame1, frame2, blocksize)
-    image1gray = image2double(rgb2gray(frame1));
-    image1 = imresize(image1gray, 0.5); % downsize to half
-    image2gray = image2double(rgb2gray(frame2));
-    image2 = imresize(image2gray, 0.5); % downsize to half
-    w = round(blocksize/2);
+    image1gray = im2double(rgb2gray(frame1));
+    image1 = imresize(image1gray, 0.5); 
+    image2gray = im2double(rgb2gray(frame2));
+    image2 = imresize(image2gray, 0.5); 
+    window = round(blocksize/2);
     [Ix_m, Iy_m] = gradient(image1);
-    It_m = conv2(image1, ones(2), 'valid') + conv2(image2, -ones(2), 'valid');
+    It_m =  image_difference(frame1, frame2);
     u = zeros(size(image1));
     v = zeros(size(image2));
 
-    % within window ww * ww
-    for i = w+1:size(Ix_m,1)-w
-       for j = w+1:size(Ix_m,2)-w
-          Ix = Ix_m(i-w:i+w, j-w:j+w);
-          Iy = Iy_m(i-w:i+w, j-w:j+w);
-          It = It_m(i-w:i+w, j-w:j+w);
-
-          Ix = Ix(:);
-          Iy = Iy(:);
-          b = -It(:); % get b here
-
-          A = [Ix Iy]; % get A here
-          nu = pinv(A)*b; % get velocity here
-
+    for i = window+1:size(Ix_m,1)-window
+       for j = window+1:size(Ix_m,2)-window
+          Ix = Ix_m(i-window:i+window, j-window:j+window);
+          Iy = Iy_m(i-window:i+window, j-window:j+window);
+          It = It_m(i-window:i+window, j-window:j+window);
+          a11 = Ix.*Ix;
+          a12 = Ix.*Iy;
+          a22 = Iy.*Iy;
+          b11 = Ix.*It;
+          b12 = Iy.*It;
+          A11 = sum(a11(:));
+          A12 = sum(a12(:));
+          A21 = sum(a12(:));
+          A22 = sum(a22(:));
+          B11 = sum(b11(:));
+          B12 = sum(b12(:));
+          A = [A11 A12; A21 A22];
+          b = -[B11; B12];
+          nu = pinv(A)*b; 
           u(i,j)=nu(1);
           v(i,j)=nu(2);
-       end;
-    end;
+       end
+    end
 
-    % downsize u and v
-    u_deci = u(1:10:end, 1:10:end);
-    v_deci = v(1:10:end, 1:10:end);
-    % get coordinate for u and v in the original frame
-    [m, n] = size(image1gray);
-    [X,Y] = meshgrid(1:n, 1:m);
+    u_final = u(1:10:end, 1:10:end);
+    v_final = v(1:10:end, 1:10:end);
+    [rows, colu] = size(image1gray);
+    [X,Y] = meshgrid(1:n, 1:rows);
     X_deci = X(1:20:end, 1:20:end);
     Y_deci = Y(1:20:end, 1:20:end);
-   % figure();
-    imshow(fr2);
+            subplot(2,2,1);
+            imshow(frame1);
+            subplot(2,2,2);
+            imshow(frame2);
+            subplot(2,2,3);    
+            imshow(uint8(It_m), 'DisplayRange', []);
+            subplot(2,2,4);
+    imshow(frame2);
     hold on;
     % draw the velocity vectors
-    quiver(X_deci, Y_deci, u_deci,v_deci, 'y')
+    quiver(X_deci, Y_deci, u_final,v_final, 'y')
 end
 
-
-function [] = opticalflow(frame1, frame2, blockSize)
-%     disp("step 1")
-    window = round(blockSize/2);
-    image1 = double(rgb2gray(imresize(frame1, 0.5)));
-    image2 = double(rgb2gray(imresize(frame2, 0.5)));
-    [rows, columns] = size(image1);
-    [diX, diY] = gradient(image1);
-    difference = image_difference(frame1, frame2);
-    u = zeros(size(image1));
-    v = zeros(size(image2));
-%     disp("step 2")
-    for i=  window+1:size(diX,1)-window
-       for j = window+1:size(diX,2)-window
-%             disp("step 3")
-            Ix = diX(i-window:i+window, j-window:j+window);
-            Iy = diY(i-window:i+window, j-window:j+window);
-            It = difference(i-window:i+window, j-window:j+window);
-            a11 = Ix.*Ix;
-            a12 = Ix.*Iy;
-            a22 = Iy.*Iy;
-            b11 = Ix.*It;
-            b12 = Iy.*It;
-            A11 = sum(a11(:));
-            A12 = sum(a12(:));
-            A21 = sum(a12(:));
-            A22 = sum(a22(:));
-            B11 = sum(b11(:));
-            B12 = sum(b12(:));
-            A = [A11 A12; A21 A22];
-            B = [B11; B12];
-%             Ix = Ix(:);
-%             Iy = Iy(:);
-%             b = -It(:); 
-% 
-%             A = [Ix Iy]; 
-            nu = pinv(A)*-B; 
-
-            u(i,j)=nu(1);
-            v(i,j)=nu(2);
-%             disp("step 4")
-       end
-     end
-%     X = (1 : blockSize : columns-1) + blockSize/2;
-%     Y = (1 : blockSize : rows-1) + blockSize/2;
-%     disp("step 5")
-    [X,Y] = meshgrid(1: columns, 1: rows);
-%     disp(u)
-    figure;
-%     close all
-    imshow(frame2)
-    hold on
-    quiver(X(1:20:end, 1:20:end), Y(1:20:end,1:20:end), u(1:20:end, 1:20:end), v(1:20:end, 1:20:end))     
-    pause(0.05)
-    hold off
-%     disp("step 6")
-%     close all
-end

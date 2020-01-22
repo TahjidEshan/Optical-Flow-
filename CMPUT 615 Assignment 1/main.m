@@ -51,10 +51,11 @@ function [] = main()
         F = fullfile(directory,S(1).name);
         first_frame = imread(F);
         M(1) = getframe;
+        figure;
         for k = 2:numel(S)
             F = fullfile(directory,S(k).name);
             current_frame = imread(F);
-            figure;
+%             figure;
             opticalflownew(first_frame, current_frame, blocksize);
             first_frame=current_frame;
             M(k) = getframe;
